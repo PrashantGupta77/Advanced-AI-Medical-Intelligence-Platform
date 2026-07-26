@@ -8,7 +8,7 @@ RUN pip install --default-timeout=1000 --no-cache-dir -r requirements.txt
 
 COPY backend ./backend
 
-COPY models ./backend/models
+COPY models ./models
 
 WORKDIR /app/backend
 
