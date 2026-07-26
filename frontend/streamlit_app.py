@@ -5,7 +5,12 @@ import pandas as pd
 import io
 
 
-BACKEND_URL = "http://127.0.0.1:8000"
+import os
+
+BACKEND_URL = os.getenv(
+    "BACKEND_URL",
+    "http://localhost:8000"
+)
 
 
 
@@ -222,7 +227,7 @@ if uploaded_file:
 
             caption="Original X-Ray",
 
-            use_container_width=True
+            width="stretch"
 
         )
 
@@ -257,7 +262,7 @@ Pneumonia Detection
 
         "🚀 Analyze X-Ray",
 
-        use_container_width=True
+        width="stretch"
 
     ):
 
@@ -404,15 +409,35 @@ Pneumonia Detection
             )
 
 
-            st.image(
+            try:
 
-                gradcam_path,
+                response = requests.get(
+                    gradcam_path
+                )
 
-                caption="AI Attention Heatmap",
+                if response.status_code == 200:
 
-                width=500
+                    gradcam_image = Image.open(
+                        io.BytesIO(response.content)
+                    )
 
-            )
+                    st.image(
+                        gradcam_image,
+                        caption="AI Attention Heatmap",
+                        width=500
+                    )
+
+                else:
+
+                    st.error(
+                        f"GradCAM image loading failed: {response.status_code}"
+                    )
+
+            except Exception as e:
+
+                st.error(
+                    f"GradCAM error: {e}"
+                )
 
 
 
@@ -524,7 +549,7 @@ if st.button(
 
     "Refresh History",
 
-    use_container_width=True
+    width="stretch"
 
 ):
 
@@ -554,6 +579,6 @@ if st.button(
 
             df,
 
-            use_container_width=True
+            width="stretch"
 
         )

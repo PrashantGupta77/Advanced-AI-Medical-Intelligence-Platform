@@ -1,7 +1,7 @@
 from pydantic_settings import BaseSettings
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
@@ -10,9 +10,7 @@ class Settings(BaseSettings):
 
     VERSION: str = "1.0.0"
 
-    MODEL_PATH: str = str(
-        BASE_DIR / "models" / "final_medical_ai_model.keras"
-    )
+    MODEL_PATH: str = "models/final_medical_ai_model.keras"
 
     DATABASE_URL: str = "sqlite:///medical.db"
 
