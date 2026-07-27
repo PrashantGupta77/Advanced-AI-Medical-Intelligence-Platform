@@ -1,8 +1,17 @@
+import os
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+
 import numpy as np
 
 from PIL import Image
 
 import tensorflow as tf
+
+# Limit TensorFlow memory usage on Render
+tf.config.threading.set_intra_op_parallelism_threads(1)
+tf.config.threading.set_inter_op_parallelism_threads(1)
+
 
 from tensorflow.keras.models import load_model
 
@@ -18,7 +27,8 @@ class ModelService:
     def __init__(self):
 
         self.model = load_model(
-            settings.MODEL_PATH
+            settings.MODEL_PATH,
+            compile=False
         )
 
         print("Medical AI Model Loaded")
@@ -64,9 +74,10 @@ class ModelService:
         )
 
 
-        prediction = self.model.predict(
-            img_array
-        )[0][0]
+        prediction = self.model(
+            img_array,
+            training=False
+        ).numpy()[0][0]
 
 
         if prediction >= 0.5:

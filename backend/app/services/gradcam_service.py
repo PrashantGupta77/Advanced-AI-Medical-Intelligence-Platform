@@ -1,7 +1,10 @@
+import gc
+
 import tensorflow as tf
 import numpy as np
 import cv2
 import os
+import uuid
 
 from PIL import Image
 
@@ -23,6 +26,24 @@ class GradCAMService:
     def __init__(self):
 
         self.model = model_service.model
+
+
+        self.grad_model = tf.keras.models.Model(
+
+            inputs=self.model.inputs,
+
+            outputs=[
+                self.model.get_layer(
+                    "top_conv"
+                ).output,
+
+                self.model.output
+            ]
+
+        )
+
+
+        print("GradCAM Model Ready")
 
 
     def generate_gradcam(
@@ -62,28 +83,15 @@ class GradCAMService:
 
 
 
-        grad_model = tf.keras.models.Model(
-
-            inputs=self.model.inputs,
-
-            outputs=[
-                self.model.get_layer(
-                    last_conv_layer_name
-                ).output,
-
-                self.model.output
-
-            ]
-
-        )
+        
 
 
 
         with tf.GradientTape() as tape:
 
 
-            conv_outputs, predictions = grad_model(
-                [img_array]
+            conv_outputs, predictions = self.grad_model(
+                img_array
             )
 
 
@@ -165,7 +173,7 @@ class GradCAMService:
 
         output_path = os.path.join(
             OUTPUT_FOLDER,
-            "gradcam_xray.jpeg"
+            f"gradcam_{uuid.uuid4()}.jpeg"
         )
 
 
@@ -174,6 +182,9 @@ class GradCAMService:
             superimposed_img
         )
 
+        gc.collect()
+
+        tf.keras.backend.clear_session()
 
         return output_path.replace("\\", "/")
 
