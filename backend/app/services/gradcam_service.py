@@ -5,7 +5,7 @@ import os
 
 from PIL import Image
 
-from app.config import settings
+from app.services.model_service import model_service
 
 
 OUTPUT_FOLDER = "outputs"
@@ -22,9 +22,7 @@ class GradCAMService:
 
     def __init__(self):
 
-        self.model = tf.keras.models.load_model(
-            settings.MODEL_PATH
-        )
+        self.model = model_service.model
 
 
     def generate_gradcam(
